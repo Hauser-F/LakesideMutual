@@ -69,4 +69,17 @@ public class CustomerInformationHolder {
 			@ApiParam(value = "the customer's updated profile", required = true) @Valid @RequestBody CustomerProfileDto customerProfile) {
 		return customerCoreRemoteProxy.updateCustomer(customerId, customerProfile);
 	}
+
+	@GetMapping(value = "/helloWorld")
+	public ResponseEntity<String> helloWorld() {
+		logger.info("Hello World info");
+		return ResponseEntity.ok(customerCoreRemoteProxy.helloWorld());
+	}
+
+	@GetMapping(value = "/cycle")
+	public ResponseEntity<String> cycle() {
+		logger.info("hey");
+		return ResponseEntity.ok("hey");
+	}
+
 }

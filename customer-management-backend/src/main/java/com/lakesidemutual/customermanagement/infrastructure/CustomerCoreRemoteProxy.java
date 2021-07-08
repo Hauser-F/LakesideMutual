@@ -58,4 +58,14 @@ public class CustomerCoreRemoteProxy implements InfrastructureService {
 			throw new CustomerCoreNotAvailableException(errorMessage);
 		}
 	}
+
+	public String helloWorld() {
+		try {
+			return customerCoreClient.cycle();
+		} catch(FeignException e) {
+			final String errorMessage = "Failed to connect to Customer Core.";
+			logger.info(errorMessage, e);
+			throw new CustomerCoreNotAvailableException(errorMessage);
+		}
+	}
 }

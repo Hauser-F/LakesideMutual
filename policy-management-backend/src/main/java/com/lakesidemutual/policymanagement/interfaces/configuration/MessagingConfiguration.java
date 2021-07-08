@@ -19,6 +19,8 @@ import org.springframework.jms.support.converter.MessageType;
 import com.lakesidemutual.policymanagement.domain.insurancequoterequest.CustomerDecisionEvent;
 import com.lakesidemutual.policymanagement.domain.insurancequoterequest.InsuranceQuoteRequestEvent;
 
+import javax.jms.ConnectionFactory;
+
 /**
  * The MessagingConfiguration class configures the ActiveMQ message broker. This broker is used
  * to send events to the Risk Management Server when a policy changes.
@@ -76,7 +78,7 @@ public class MessagingConfiguration {
 	}
 
 	@Bean
-	public ActiveMQConnectionFactory connectionFactory(){
+	public ConnectionFactory connectionFactory(){
 		ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory();
 		connectionFactory.setTrustAllPackages(true);
 		connectionFactory.setUserName(username);

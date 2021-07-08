@@ -55,7 +55,7 @@ import io.swagger.annotations.ApiParam;
  */
 @RestController
 @RequestMapping("/insurance-quote-requests")
-public class InsuranceQuoteRequestCoordinator {
+public class InsuranceQuoteRequestCoordinatorController {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired

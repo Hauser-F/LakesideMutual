@@ -33,4 +33,7 @@ public interface CustomerCoreClient {
 	ResponseEntity<CustomerDto> updateCustomer(
 			@PathVariable CustomerId customerId,
 			@RequestBody CustomerProfileDto requestDto);
+
+	@GetMapping(value = "/hello/cycle")
+	String cycle();
 }

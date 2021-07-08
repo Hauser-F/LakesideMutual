@@ -26,6 +26,8 @@ services:
       - ./customer-core/src:/usr/src/app
     environment:
       - "SPRING_BOOT_ADMIN_CLIENT_URL=http://spring-boot-admin:9000"
+      - "SPRING_ZIPKIN_BASE-URL=http://tracing-server:9411"
+      - "CUSTOMERMANAGEMENT_BASEURL=http://customer-management-backend:8110"
     ports:
       - "8110:8110"
 
@@ -39,18 +41,31 @@ services:
     environment:
       - "CUSTOMERCORE_BASEURL=http://customer-core:8110"
       - "SPRING_BOOT_ADMIN_CLIENT_URL=http://spring-boot-admin:9000"
+      - "SPRING_ZIPKIN_BASE-URL=http://tracing-server:9411"
     ports:
       - "8100:8100"
 
   customer-management-frontend:
-    build: 
+    build:
       context: ./customer-management-frontend
-    volumes: 
+    volumes:
       - ./customer-management-frontend/src:/usr/src/app
     depends_on:
       - customer-management-backend
     ports:
       - "3020:80"
+
+#  customer-management-frontend:
+#    build: customer-management-frontend
+#    image: lakesidemutual/customer-management-frontend
+#    depends_on:
+#      - customer-management-backend
+#    environment:
+#      - "REACT_APP_CUSTOMER_MANAGEMENT_BACKEND=http://customer-management-backend:8100"
+#    ports:
+#      - "3020:80"
+#    volumes:
+#      - "node_modules:/usr/src/app/node_modules"
 
   policy-management-backend:
     build: 
@@ -62,6 +77,7 @@ services:
     environment:
       - "CUSTOMERCORE_BASEURL=http://customer-core:8110"
       - "SPRING_BOOT_ADMIN_CLIENT_URL=http://spring-boot-admin:9000"
+      - "SPRING_ZIPKIN_BASE-URL=http://tracing-server:9411"
     ports:
       - "8090:8090"
       - "61613:61613"
@@ -76,6 +92,18 @@ services:
     ports:
       - "3010:80"
 
+#  policy-management-frontend:
+#    build: policy-management-frontend
+#    image: lakesidemutual/policy-management-frontend
+#    depends_on:
+#      - policy-management-backend
+#    environment:
+#      - "VUE_APP_POLICY_MANAGEMENT_BACKEND=http://policy-management-backend:8090"
+#    ports:
+#      - "3010:80"
+#    volumes:
+#      - "node_modules:/usr/src/app/node_modules"
+
   customer-self-service-backend:
     build: 
       context: ./customer-self-service-backend
@@ -88,13 +116,14 @@ services:
       - "CUSTOMERCORE_BASEURL=http://customer-core:8110"
       - "POLICYMANAGEMENT_TCPBROKERBINDADDRESS=tcp://policy-management-backend:61616"
       - "SPRING_BOOT_ADMIN_CLIENT_URL=http://spring-boot-admin:9000"
+      - "SPRING_ZIPKIN_BASE-URL=http://tracing-server:9411"
     ports:
       - "8080:8080"
 
   customer-self-service-frontend:
-    build: 
+    build:
       context: ./customer-self-service-frontend
-    volumes: 
+    volumes:
       - ./customer-self-service-frontend/src:/usr/src/app
     depends_on:
       - customer-self-service-backend
@@ -103,10 +132,26 @@ services:
     ports:
       - "3000:80"
 
+#  customer-self-service-frontend:
+#    build: customer-self-service-frontend
+#    image: lakesidemutual/customer-self-service-frontend
+#    depends_on:
+#      - customer-self-service-backend
+#      - customer-management-backend
+#      - policy-management-backend
+#    environment:
+#      - "REACT_APP_CUSTOMER_SELF_SERVICE_BACKEND=http://customer-self-service-backend:8080"
+#      - "REACT_APP_POLICY_MANAGEMENT_BACKEND=http://policy-management-backend:8090"
+#      - "REACT_APP_CUSTOMER_MANAGEMENT_BACKEND=http://customer-management-backend:8100"
+#    ports:
+#      - "3000:80"
+#    volumes:
+#      - "node_modules:/usr/src/app/node_modules"
+
   risk-management-server:
-    build: 
+    build:
       context: ./risk-management-server
-    volumes: 
+    volumes:
       - ./risk-management-server/src:/usr/src/app
     depends_on:
       - policy-management-backend
@@ -115,3 +160,28 @@ services:
       - "ACTIVEMQ_PORT=61613"
     ports:
       - "50051:50051"
+
+#  risk-management-server:
+#    build: risk-management-server
+#    image: lakesidemutual/risk-management-server
+#    depends_on:
+#      - policy-management-backend
+#    environment:
+#      - "activeMQ.host=policy-management-backend"
+#      - "activeMQ.port=61613"
+#    ports:
+#      - "50051:50051"
+#    volumes:
+#      - "node_modules:/usr/src/app/node_modules"
+
+  tracing-server:
+    image: openzipkin/zipkin
+    container_name: tracing-server
+    mem_limit: 512M
+    environment:
+      - JAVA_OPTS=-XX:+UnlockExperimentalVMOptions -Djava.security.egd=file:/dev/./urandom
+    ports:
+      - 9411:9411
+
+#volumes:
+#  node_modules:

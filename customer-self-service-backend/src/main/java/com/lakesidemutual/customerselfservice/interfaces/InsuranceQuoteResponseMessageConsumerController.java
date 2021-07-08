@@ -22,7 +22,7 @@ import com.lakesidemutual.customerselfservice.infrastructure.InsuranceQuoteReque
  * of the corresponding insurance quote requests.
  * */
 @Component
-public class InsuranceQuoteResponseMessageConsumer {
+public class InsuranceQuoteResponseMessageConsumerController {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired

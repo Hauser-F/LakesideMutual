@@ -17,6 +17,8 @@ import com.lakesidemutual.customerselfservice.domain.insurancequoterequest.Insur
 import com.lakesidemutual.customerselfservice.domain.insurancequoterequest.InsuranceQuoteResponseEvent;
 import com.lakesidemutual.customerselfservice.domain.insurancequoterequest.PolicyCreatedEvent;
 
+import javax.jms.ConnectionFactory;
+
 @Configuration
 public class MessagingConfiguration {
 	@Value("${policymanagement.tcpBrokerBindAddress}")
@@ -37,7 +39,7 @@ public class MessagingConfiguration {
 	}
 
 	@Bean
-	public ActiveMQConnectionFactory connectionFactory(){
+	public ConnectionFactory connectionFactory(){
 		ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory();
 		connectionFactory.setBrokerURL(brokerURL);
 		connectionFactory.setUserName(username);
