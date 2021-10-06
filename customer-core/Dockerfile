@@ -5,9 +5,10 @@ COPY src ${BASE}/src
 RUN --mount=type=cache,target=/root/.m2 mvn -f ${BASE}/pom.xml install -DskipTests
 
 FROM openjdk:8-jdk-alpine
+ENV JAVA_TOOL_OPTIONS -Xdebug -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=8111
 COPY --from=build /usr/src/app/target/dependency/BOOT-INF/lib/* /app/lib/
 COPY --from=build /usr/src/app/target/dependency/META-INF /app/META-INF
 COPY --from=build /usr/src/app/target/dependency/BOOT-INF/classes /app
 
-EXPOSE 8110
-ENTRYPOINT ["java","-cp","app:app/lib/*","com.lakesidemutual.customercore.CustomerCoreApplication"]
+EXPOSE 8110 8111
+ENTRYPOINT ["java", "-cp","app:app/lib/*","com.lakesidemutual.customercore.CustomerCoreApplication"]

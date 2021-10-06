@@ -20,16 +20,15 @@ services:
       - "9000:9000"
 
   customer-core:
-    build: 
-      context: ./customer-core
-    volumes: 
-      - ./customer-core/src:/usr/src/app
+    build: customer-core
+    image: customer-core
     environment:
       - "SPRING_BOOT_ADMIN_CLIENT_URL=http://spring-boot-admin:9000"
       - "SPRING_ZIPKIN_BASE-URL=http://tracing-server:9411"
-      - "CUSTOMERMANAGEMENT_BASEURL=http://customer-management-backend:8110"
+      - "CUSTOMERMANAGEMENT_BASEURL=http://customer-management-backend:8100"
     ports:
       - "8110:8110"
+      - "8111:8111"
 
   customer-management-backend:
     build: 
@@ -107,7 +106,7 @@ services:
   customer-self-service-backend:
     build: 
       context: ./customer-self-service-backend
-    volumes: 
+    volumes:
       - ./customer-self-service-backend/src:/usr/src/app
     depends_on:
       - customer-core
@@ -151,8 +150,8 @@ services:
   risk-management-server:
     build:
       context: ./risk-management-server
-    volumes:
-      - ./risk-management-server/src:/usr/src/app
+#    volumes:
+#      - ./risk-management-server/src:/usr/src/app
     depends_on:
       - policy-management-backend
     environment:
@@ -177,11 +176,39 @@ services:
   tracing-server:
     image: openzipkin/zipkin
     container_name: tracing-server
-    mem_limit: 512M
+    depends_on:
+      - elasticsearch
     environment:
       - JAVA_OPTS=-XX:+UnlockExperimentalVMOptions -Djava.security.egd=file:/dev/./urandom
+      - "STORAGE_TYPE=elasticsearch"
+      - "ES_HOSTS=elasticsearch:9200"
+      - ES_HTTP_LOGGING=BODY
     ports:
       - 9411:9411
+
+
+  elasticsearch:
+    container_name: elasticsearch
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.11.0
+    environment:
+      - xpack.security.enabled=false
+      - "discovery.type=single-node"
+    ports:
+      - 9200:9200
+    deploy:
+      resources:
+        limits:
+            memory: 3g
+
+  kibana:
+    container_name: kibana
+    image: docker.elastic.co/kibana/kibana:7.11.0
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    depends_on:
+      - elasticsearch
+    ports:
+      - 5601:5601
 
 #volumes:
 #  node_modules:
