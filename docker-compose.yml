@@ -175,14 +175,15 @@ services:
 
   tracing-server:
     image: openzipkin/zipkin
-    container_name: tracing-server
+    container_name: tracing
     depends_on:
       - elasticsearch
+      - db
     environment:
-      - JAVA_OPTS=-XX:+UnlockExperimentalVMOptions -Djava.security.egd=file:/dev/./urandom
-      - "STORAGE_TYPE=elasticsearch"
-      - "ES_HOSTS=elasticsearch:9200"
-      - ES_HTTP_LOGGING=BODY
+      - STORAGE_TYPE=mysql
+      - MYSQL_USER=root
+      - MYSQL_PASS=example
+      - MYSQL_HOST=db
     ports:
       - 9411:9411
 
@@ -210,5 +211,24 @@ services:
     ports:
       - 5601:5601
 
-#volumes:
-#  node_modules:
+  db:
+    container_name: mysql-db
+    image: mysql
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+    volumes:
+      - mysql-data:/var/lib/mysql
+    ports:
+      - 3307:3306
+
+  adminer:
+    container_name: adminer
+    image: adminer
+    restart: always
+    ports:
+      - 8180:8080
+
+volumes:
+  mysql-data:
