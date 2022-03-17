@@ -178,19 +178,18 @@ services:
     container_name: tracing
     depends_on:
       - elasticsearch
-      - db
     environment:
-      - STORAGE_TYPE=mysql
-      - MYSQL_USER=root
-      - MYSQL_PASS=example
-      - MYSQL_HOST=db
+      - JAVA_OPTS=-XX:+UnlockExperimentalVMOptions -Djava.security.egd=file:/dev/./urandom
+      - STORAGE_TYPE=elasticsearch
+      - ES_HOSTS=elasticsearch:9200
+      - ES_HTTP_LOGGING=BODY
     ports:
       - 9411:9411
 
 
   elasticsearch:
     container_name: elasticsearch
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.11.0
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.0
     environment:
       - xpack.security.enabled=false
       - "discovery.type=single-node"
